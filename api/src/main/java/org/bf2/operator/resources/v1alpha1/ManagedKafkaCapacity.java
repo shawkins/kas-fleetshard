@@ -6,12 +6,12 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 /**
- * Defines the capacity provided by a ManagedKafka instance in terms of throughput, connection, data retention and more
+ * Defines the capacity provided by a ManagedKafka instance in terms of
+ * throughput, connection, data retention and more
  */
 @Buildable(
         builderPackage = "io.fabric8.kubernetes.api.builder",
-        editableEnabled = false
-)
+        editableEnabled = false)
 @ToString
 @EqualsAndHashCode
 public class ManagedKafkaCapacity {

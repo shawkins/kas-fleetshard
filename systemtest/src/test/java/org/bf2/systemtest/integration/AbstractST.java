@@ -1,7 +1,5 @@
 package org.bf2.systemtest.integration;
 
-import io.fabric8.kubernetes.client.dsl.base.CustomResourceDefinitionContext;
-import io.strimzi.api.kafka.Crds;
 import org.bf2.systemtest.framework.ExtensionContextParameterResolver;
 import org.bf2.systemtest.framework.IndicativeSentences;
 import org.bf2.systemtest.framework.ResourceManager;
@@ -14,9 +12,9 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 /**
- * Base systemtest class which should be derived in every ST class
- * Provides extensions and base callbacks from framework
- * Using this class cause avoiding test duplications
+ * Base systemtest class which should be derived in every ST class Provides
+ * extensions and base callbacks from framework Using this class cause avoiding
+ * test duplications
  */
 
 @ExtendWith(TestCallbackListener.class)

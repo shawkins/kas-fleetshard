@@ -48,7 +48,8 @@ public class ManagedKafkaControllerTest {
 
         mk.getSpec().setDeleted(true);
         // this simulates, but not exactly an issue seen with older logic
-        // essentially there "last event" of the delete is something other than a deployment or a kafka
+        // essentially there "last event" of the delete is something other than a
+        // deployment or a kafka
         // it should still trigger the update of the status
         Mockito.when(context.getEvents())
                 .thenReturn(new EventList(Arrays.asList(new ResourceEvent.ServiceEvent(new ServiceBuilder()

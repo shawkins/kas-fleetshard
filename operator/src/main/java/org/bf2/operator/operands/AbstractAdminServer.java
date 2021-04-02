@@ -1,15 +1,16 @@
 package org.bf2.operator.operands;
 
+import javax.inject.Inject;
+
+import org.bf2.operator.InformerManager;
+import org.bf2.operator.resources.v1alpha1.ManagedKafka;
+import org.jboss.logging.Logger;
+
 import io.fabric8.kubernetes.api.model.Service;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.dsl.Resource;
 import io.javaoperatorsdk.operator.api.Context;
-import org.bf2.operator.InformerManager;
-import org.bf2.operator.resources.v1alpha1.ManagedKafka;
-import org.jboss.logging.Logger;
-
-import javax.inject.Inject;
 
 public abstract class AbstractAdminServer implements Operand<ManagedKafka> {
 
@@ -35,13 +36,19 @@ public abstract class AbstractAdminServer implements Operand<ManagedKafka> {
 
     protected void createOrUpdate(Deployment deployment) {
         // Admin Server deployment resource doesn't exist, has to be created
-        if (kubernetesClient.apps().deployments()
+        if (kubernetesClient.apps()
+                .deployments()
                 .inNamespace(deployment.getMetadata().getNamespace())
-                .withName(deployment.getMetadata().getName()).get() == null) {
-            kubernetesClient.apps().deployments().inNamespace(deployment.getMetadata().getNamespace()).create(deployment);
-        // Admin Server deployment resource already exists, has to be updated
+                .withName(deployment.getMetadata().getName())
+                .get() == null) {
+            kubernetesClient.apps()
+                    .deployments()
+                    .inNamespace(deployment.getMetadata().getNamespace())
+                    .create(deployment);
+            // Admin Server deployment resource already exists, has to be updated
         } else {
-            kubernetesClient.apps().deployments()
+            kubernetesClient.apps()
+                    .deployments()
                     .inNamespace(deployment.getMetadata().getNamespace())
                     .withName(deployment.getMetadata().getName())
                     .patch(deployment);
@@ -52,9 +59,10 @@ public abstract class AbstractAdminServer implements Operand<ManagedKafka> {
         // Admin Server service resource doesn't exist, has to be created
         if (kubernetesClient.services()
                 .inNamespace(service.getMetadata().getNamespace())
-                .withName(service.getMetadata().getName()).get() == null) {
+                .withName(service.getMetadata().getName())
+                .get() == null) {
             kubernetesClient.services().inNamespace(service.getMetadata().getNamespace()).create(service);
-        // Admin Server service resource already exists, has to be updated
+            // Admin Server service resource already exists, has to be updated
         } else {
             kubernetesClient.services()
                     .inNamespace(service.getMetadata().getNamespace())
@@ -87,7 +95,8 @@ public abstract class AbstractAdminServer implements Operand<ManagedKafka> {
     public boolean isReady(ManagedKafka managedKafka) {
         Deployment deployment = cachedDeployment(managedKafka);
         boolean isReady = deployment != null && (deployment.getStatus() == null ||
-                (deployment.getStatus().getReadyReplicas() != null && deployment.getStatus().getReadyReplicas().equals(deployment.getSpec().getReplicas())));
+                (deployment.getStatus().getReadyReplicas() != null
+                        && deployment.getStatus().getReadyReplicas().equals(deployment.getSpec().getReplicas())));
         log.debugf("Admin Server isReady = %s", isReady);
         return isReady;
     }
@@ -111,8 +120,9 @@ public abstract class AbstractAdminServer implements Operand<ManagedKafka> {
                 .withName(adminServerName(managedKafka));
     }
 
-    protected Resource<Deployment> adminDeploymentResource(ManagedKafka managedKafka){
-        return kubernetesClient.apps().deployments()
+    protected Resource<Deployment> adminDeploymentResource(ManagedKafka managedKafka) {
+        return kubernetesClient.apps()
+                .deployments()
                 .inNamespace(adminServerNamespace(managedKafka))
                 .withName(adminServerName(managedKafka));
     }

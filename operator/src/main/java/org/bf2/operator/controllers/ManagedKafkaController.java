@@ -1,16 +1,11 @@
 package org.bf2.operator.controllers;
 
-import io.fabric8.kubernetes.api.model.HasMetadata;
-import io.fabric8.kubernetes.client.KubernetesClient;
-import io.fabric8.openshift.client.OpenShiftClient;
-import io.javaoperatorsdk.operator.api.Context;
-import io.javaoperatorsdk.operator.api.Controller;
-import io.javaoperatorsdk.operator.api.DeleteControl;
-import io.javaoperatorsdk.operator.api.ResourceController;
-import io.javaoperatorsdk.operator.api.UpdateControl;
-import io.javaoperatorsdk.operator.processing.event.Event;
-import io.javaoperatorsdk.operator.processing.event.EventSourceManager;
-import io.javaoperatorsdk.operator.processing.event.internal.CustomResourceEvent;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+
+import javax.inject.Inject;
 
 import org.bf2.common.ConditionUtils;
 import org.bf2.operator.events.ResourceEvent;
@@ -26,12 +21,17 @@ import org.bf2.operator.resources.v1alpha1.ManagedKafkaStatusBuilder;
 import org.bf2.operator.resources.v1alpha1.VersionsBuilder;
 import org.jboss.logging.Logger;
 
-import javax.inject.Inject;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import io.fabric8.kubernetes.api.model.HasMetadata;
+import io.fabric8.kubernetes.client.KubernetesClient;
+import io.fabric8.openshift.client.OpenShiftClient;
+import io.javaoperatorsdk.operator.api.Context;
+import io.javaoperatorsdk.operator.api.Controller;
+import io.javaoperatorsdk.operator.api.DeleteControl;
+import io.javaoperatorsdk.operator.api.ResourceController;
+import io.javaoperatorsdk.operator.api.UpdateControl;
+import io.javaoperatorsdk.operator.processing.event.Event;
+import io.javaoperatorsdk.operator.processing.event.EventSourceManager;
+import io.javaoperatorsdk.operator.processing.event.internal.CustomResourceEvent;
 
 @Controller
 public class ManagedKafkaController implements ResourceController<ManagedKafka> {
@@ -65,7 +65,8 @@ public class ManagedKafkaController implements ResourceController<ManagedKafka> 
 
     @Override
     public DeleteControl deleteResource(ManagedKafka managedKafka, Context<ManagedKafka> context) {
-        log.infof("Kafka instance %s/%s fully deleted", managedKafka.getMetadata().getNamespace(), managedKafka.getMetadata().getName());
+        log.infof("Kafka instance %s/%s fully deleted", managedKafka.getMetadata().getNamespace(),
+                managedKafka.getMetadata().getName());
         return DeleteControl.DEFAULT_DELETE;
     }
 
@@ -74,7 +75,8 @@ public class ManagedKafkaController implements ResourceController<ManagedKafka> 
         if (managedKafka.getSpec().isDeleted()) {
             // check that it's actually not deleted yet, so operands are gone
             if (!kafkaInstance.isDeleted(managedKafka)) {
-                log.infof("Deleting Kafka instance %s/%s", managedKafka.getMetadata().getNamespace(), managedKafka.getMetadata().getName());
+                log.infof("Deleting Kafka instance %s/%s", managedKafka.getMetadata().getNamespace(),
+                        managedKafka.getMetadata().getName());
                 kafkaInstance.delete(managedKafka, context);
             }
         } else {
@@ -83,21 +85,24 @@ public class ManagedKafkaController implements ResourceController<ManagedKafka> 
     }
 
     /**
-     * This logic handles events (edge triggers) using level logic.
-     * On any modification to the ManagedKafka or it's owned resources,
-     * perform a full update to the desired state.
-     * This strategy is straight-forward and works well as long as few events are expected.
+     * This logic handles events (edge triggers) using level logic. On any
+     * modification to the ManagedKafka or it's owned resources, perform a full
+     * update to the desired state. This strategy is straight-forward and works well
+     * as long as few events are expected.
      */
     @Override
-    public UpdateControl<ManagedKafka> createOrUpdateResource(ManagedKafka managedKafka, Context<ManagedKafka> context) {
+    public UpdateControl<ManagedKafka> createOrUpdateResource(ManagedKafka managedKafka,
+            Context<ManagedKafka> context) {
         if (log.isDebugEnabled()) {
             for (Event event : context.getEvents().getList()) {
                 if (event instanceof ResourceEvent) {
-                    ResourceEvent<?> resourceEvent = (ResourceEvent<?>)event;
+                    ResourceEvent<?> resourceEvent = (ResourceEvent<?>) event;
                     HasMetadata resource = resourceEvent.getResource();
-                    log.debugf("%s resource %s/%s is changed", resource.getKind(), resource.getMetadata().getNamespace(), resource.getMetadata().getName());
+                    log.debugf("%s resource %s/%s is changed", resource.getKind(),
+                            resource.getMetadata().getNamespace(), resource.getMetadata().getName());
                 } else if (event instanceof CustomResourceEvent) {
-                    log.debugf("ManagedKafka resource %s/%s is changed", managedKafka.getMetadata().getNamespace(), managedKafka.getMetadata().getName());
+                    log.debugf("ManagedKafka resource %s/%s is changed", managedKafka.getMetadata().getNamespace(),
+                            managedKafka.getMetadata().getName());
                 }
             }
         }
@@ -120,8 +125,9 @@ public class ManagedKafkaController implements ResourceController<ManagedKafka> 
     }
 
     /**
-     * Extract from the current KafkaInstance overall status (Kafka, Canary and AdminServer)
-     * a corresponding list of ManagedKafkaCondition(s) to set on the ManagedKafka status
+     * Extract from the current KafkaInstance overall status (Kafka, Canary and
+     * AdminServer) a corresponding list of ManagedKafkaCondition(s) to set on the
+     * ManagedKafka status
      *
      * @param managedKafka ManagedKafka instance
      */
@@ -129,7 +135,7 @@ public class ManagedKafkaController implements ResourceController<ManagedKafka> 
         // add status if not already available on the ManagedKafka resource
         ManagedKafkaStatus status = Objects.requireNonNullElse(managedKafka.getStatus(),
                 new ManagedKafkaStatusBuilder()
-                .build());
+                        .build());
         status.setUpdatedTimestamp(ConditionUtils.iso8601Now());
         managedKafka.setStatus(status);
 
@@ -139,8 +145,8 @@ public class ManagedKafkaController implements ResourceController<ManagedKafka> 
             managedKafkaConditions = new ArrayList<>();
             status.setConditions(managedKafkaConditions);
         }
-        Optional<ManagedKafkaCondition> optReady =
-                ConditionUtils.findManagedKafkaCondition(managedKafkaConditions, ManagedKafkaCondition.Type.Ready);
+        Optional<ManagedKafkaCondition> optReady = ConditionUtils.findManagedKafkaCondition(managedKafkaConditions,
+                ManagedKafkaCondition.Type.Ready);
 
         ManagedKafkaCondition ready = null;
 
@@ -160,7 +166,8 @@ public class ManagedKafkaController implements ResourceController<ManagedKafka> 
             ConditionUtils.updateConditionStatus(ready, Status.True, null);
 
             // TODO: just reflecting for now what was defined in the spec
-            managedKafka.getStatus().setCapacity(new ManagedKafkaCapacityBuilder(managedKafka.getSpec().getCapacity()).build());
+            managedKafka.getStatus()
+                    .setCapacity(new ManagedKafkaCapacityBuilder(managedKafka.getSpec().getCapacity()).build());
             managedKafka.getStatus().setVersions(new VersionsBuilder(managedKafka.getSpec().getVersions()).build());
             managedKafka.getStatus().setAdminServerURI(kafkaInstance.getAdminServer().Uri(managedKafka));
 

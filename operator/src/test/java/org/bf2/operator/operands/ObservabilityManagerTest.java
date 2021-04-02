@@ -1,21 +1,23 @@
 package org.bf2.operator.operands;
 
-import io.fabric8.kubernetes.api.model.Secret;
-import io.fabric8.kubernetes.client.KubernetesClient;
-import io.quarkus.test.common.QuarkusTestResource;
-import io.quarkus.test.junit.QuarkusTest;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.Base64;
+
+import javax.inject.Inject;
+
 import org.bf2.operator.resources.v1alpha1.ObservabilityConfiguration;
 import org.bf2.operator.resources.v1alpha1.ObservabilityConfigurationBuilder;
 import org.bf2.test.mock.QuarkusKubeMockServer;
 import org.junit.jupiter.api.Test;
 
-import javax.inject.Inject;
-import java.util.Base64;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import io.fabric8.kubernetes.api.model.Secret;
+import io.fabric8.kubernetes.client.KubernetesClient;
+import io.quarkus.test.common.QuarkusTestResource;
+import io.quarkus.test.junit.QuarkusTest;
 
 @QuarkusTestResource(QuarkusKubeMockServer.class)
 @QuarkusTest
@@ -52,19 +54,26 @@ public class ObservabilityManagerTest {
         assertFalse(observabilityManager.isObservabilityRunning());
 
         ObservabilityConfiguration secretConfig = new ObservabilityConfigurationBuilder()
-                .withAccessToken(new String(decoder.decode(secret.getData().get(ObservabilityManager.OBSERVABILITY_ACCESS_TOKEN))))
-                .withChannel(new String(decoder.decode(secret.getData().get(ObservabilityManager.OBSERVABILITY_CHANNEL))))
+                .withAccessToken(new String(
+                        decoder.decode(secret.getData().get(ObservabilityManager.OBSERVABILITY_ACCESS_TOKEN))))
+                .withChannel(
+                        new String(decoder.decode(secret.getData().get(ObservabilityManager.OBSERVABILITY_CHANNEL))))
                 .withTag(new String(decoder.decode(secret.getData().get(ObservabilityManager.OBSERVABILITY_TAG))))
-                .withRepository(new String(decoder.decode(secret.getData().get(ObservabilityManager.OBSERVABILITY_REPOSITORY))))
+                .withRepository(
+                        new String(decoder.decode(secret.getData().get(ObservabilityManager.OBSERVABILITY_REPOSITORY))))
                 .build();
 
         // secret verification
         assertEquals(secretConfig, config);
         assertEquals("observability-operator", secret.getMetadata().getLabels().get("configures"));
 
-        // status verification, the Informers do not work in test framework thus direct verification
-        secret = ObservabilityManager.createObservabilitySecretBuilder(client.getNamespace(), config).editMetadata()
-                .addToAnnotations(ObservabilityManager.OBSERVABILITY_OPERATOR_STATUS, ObservabilityManager.ACCEPTED).endMetadata().build();
+        // status verification, the Informers do not work in test framework thus direct
+        // verification
+        secret = ObservabilityManager.createObservabilitySecretBuilder(client.getNamespace(), config)
+                .editMetadata()
+                .addToAnnotations(ObservabilityManager.OBSERVABILITY_OPERATOR_STATUS, ObservabilityManager.ACCEPTED)
+                .endMetadata()
+                .build();
         observabilityManager.observabilitySecretResource().createOrReplace(secret);
 
         secret = observabilityManager.observabilitySecretResource().get();

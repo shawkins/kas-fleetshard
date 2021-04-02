@@ -1,17 +1,18 @@
 package org.bf2.systemtest.api;
 
-import io.fabric8.kubernetes.client.utils.Serialization;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.bf2.operator.resources.v1alpha1.ManagedKafka;
-import org.bf2.systemtest.framework.ThrowableSupplier;
-
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.bf2.operator.resources.v1alpha1.ManagedKafka;
+import org.bf2.systemtest.framework.ThrowableSupplier;
+
+import io.fabric8.kubernetes.client.utils.Serialization;
 
 public class SyncApiClient {
     private static final Logger LOGGER = LogManager.getLogger(SyncApiClient.class);
@@ -35,7 +36,8 @@ public class SyncApiClient {
     public static HttpResponse<String> deleteManagedKafka(String id, String endpoint) throws Exception {
         LOGGER.info("Delete managed kafka {}", id);
         URI uri = URI.create(endpoint + "/api/managed-services-api/v1/agent-clusters/pepa/kafkas/" + id);
-        LOGGER.info("Sending DELETE request to {} with port {} and path {}", uri.getHost(), uri.getPort(), uri.getPath());
+        LOGGER.info("Sending DELETE request to {} with port {} and path {}", uri.getHost(), uri.getPort(),
+                uri.getPath());
 
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
@@ -78,7 +80,8 @@ public class SyncApiClient {
         for (int i = 1; i < MAX_RESEND; i++) {
             try {
                 var res = apiRequest.get();
-                if (res.statusCode() >= HttpURLConnection.HTTP_OK && res.statusCode() <= HttpURLConnection.HTTP_PARTIAL) {
+                if (res.statusCode() >= HttpURLConnection.HTTP_OK
+                        && res.statusCode() <= HttpURLConnection.HTTP_PARTIAL) {
                     return res;
                 } else {
                     throw new Exception("Status code is " + res.statusCode());
@@ -88,7 +91,7 @@ public class SyncApiClient {
                 Thread.sleep(5_000);
             }
         }
-        //last try
+        // last try
         return apiRequest.get();
     }
 }

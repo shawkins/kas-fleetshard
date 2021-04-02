@@ -68,7 +68,8 @@ public class ControlPlane {
     }
 
     /**
-     * Make an async call to update the status, but only if it is different that the old.
+     * Make an async call to update the status, but only if it is different that the
+     * old.
      *
      * newAgent is expected to be non-null
      */
@@ -96,13 +97,12 @@ public class ControlPlane {
     }
 
     /**
-     * Get the current list of ManagedKafka clusters from the control plane
-     * as a blocking call.
-     * Also updates the cache of ManagedKafka instances
+     * Get the current list of ManagedKafka clusters from the control plane as a
+     * blocking call. Also updates the cache of ManagedKafka instances
      */
     public List<ManagedKafka> getKafkaClusters() {
         ManagedKafkaList result = controlPlaneClient.getKafkaClusters(id);
-        result.getItems().forEach((mk)->addManagedKafka(mk));
+        result.getItems().forEach((mk) -> addManagedKafka(mk));
         return result.getItems();
     }
 
@@ -123,7 +123,8 @@ public class ControlPlane {
                 return Collections.emptyMap();
             }
             // for consistency we'll send an empty status
-            return Map.<String, ManagedKafkaStatus>of(clusterId, requireNonNullElse(kafka.getStatus(), EMPTY_MANAGED_KAFKA_STATUS));
+            return Map.<String, ManagedKafkaStatus>of(clusterId,
+                    requireNonNullElse(kafka.getStatus(), EMPTY_MANAGED_KAFKA_STATUS));
         });
     }
 
@@ -148,13 +149,14 @@ public class ControlPlane {
     }
 
     /**
-     * Async update the control plane with the status of this ManagedKafka, but
-     * only if it's different than the old
+     * Async update the control plane with the status of this ManagedKafka, but only
+     * if it's different than the old
      *
      * newManagedKafka is expected to be non-null as deletes are not processed
      */
     public void updateKafkaClusterStatus(ManagedKafka oldManagedKafka, ManagedKafka newManagedKafka) {
-        if (newManagedKafka.getId() != null && oldManagedKafka != null && statusChanged(oldManagedKafka.getStatus(), newManagedKafka.getStatus())) {
+        if (newManagedKafka.getId() != null && oldManagedKafka != null
+                && statusChanged(oldManagedKafka.getStatus(), newManagedKafka.getStatus())) {
             // send a status update immediately (async)
             updateKafkaClusterStatus(Cache.metaNamespaceKeyFunc(newManagedKafka), newManagedKafka.getId());
         }
@@ -177,7 +179,9 @@ public class ControlPlane {
     public void sendResync() {
         log.debug("Updating status on resync interval");
         updateKafkaClusterStatus(() -> {
-            return localLookup.getLocalManagedKafkas().stream().filter(mk -> mk.getId() != null)
+            return localLookup.getLocalManagedKafkas()
+                    .stream()
+                    .filter(mk -> mk.getId() != null)
                     .collect(Collectors.toMap(ManagedKafka::getId,
                             (mk) -> requireNonNullElse(mk.getStatus(), EMPTY_MANAGED_KAFKA_STATUS)));
         });

@@ -41,7 +41,9 @@ public class UpdateTest {
     @AfterEach
     public void afterEach() {
         // the test resource is suite scoped, so we clean up after each test
-        managedKafkaClient.list().forEach((mk)->managedKafkaClient.delete(mk.getMetadata().getNamespace(), mk.getMetadata().getName()));
+        managedKafkaClient.list()
+                .forEach(
+                        (mk) -> managedKafkaClient.delete(mk.getMetadata().getNamespace(), mk.getMetadata().getName()));
     }
 
     @Test
@@ -53,7 +55,8 @@ public class UpdateTest {
         managedKafkaClient.create(managedKafka);
 
         controlPlane.updateKafkaClusterStatus(PollerTest.exampleManagedKafka(), managedKafka);
-        assertEquals("Installed", getUpdates().getValue().get(PollerTest.PLACEMENT_ID).getConditions().get(0).getStatus());
+        assertEquals("Installed",
+                getUpdates().getValue().get(PollerTest.PLACEMENT_ID).getConditions().get(0).getStatus());
 
         // simulate a resync
         // for now we're just looking for equality
@@ -65,12 +68,14 @@ public class UpdateTest {
         // send everything
         controlPlane.sendResync();
         ArgumentCaptor<Map<String, ManagedKafkaStatus>> statusCaptor = getUpdates();
-        assertEquals("Installed", statusCaptor.getValue().get(PollerTest.PLACEMENT_ID).getConditions().get(0).getStatus());
+        assertEquals("Installed",
+                statusCaptor.getValue().get(PollerTest.PLACEMENT_ID).getConditions().get(0).getStatus());
     }
 
     private ArgumentCaptor<Map<String, ManagedKafkaStatus>> getUpdates() {
         ArgumentCaptor<Map<String, ManagedKafkaStatus>> statusCaptor = ArgumentCaptor.forClass(Map.class);
-        Mockito.verify(controlPlaneRestClient).updateKafkaClustersStatus(Mockito.eq(PollerTest.CLUSTER_ID), statusCaptor.capture());
+        Mockito.verify(controlPlaneRestClient)
+                .updateKafkaClustersStatus(Mockito.eq(PollerTest.CLUSTER_ID), statusCaptor.capture());
         return statusCaptor;
     }
 

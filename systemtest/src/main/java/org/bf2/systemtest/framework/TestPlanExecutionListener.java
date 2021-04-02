@@ -1,16 +1,15 @@
 package org.bf2.systemtest.framework;
 
-import org.bf2.test.Environment;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.junit.platform.launcher.TestExecutionListener;
-import org.junit.platform.launcher.TestIdentifier;
-import org.junit.platform.launcher.TestPlan;
-
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Arrays;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.bf2.test.Environment;
+import org.junit.platform.launcher.TestExecutionListener;
+import org.junit.platform.launcher.TestIdentifier;
+import org.junit.platform.launcher.TestPlan;
 
 public class TestPlanExecutionListener implements TestExecutionListener {
     private static final Logger LOGGER = LogManager.getLogger(TestPlanExecutionListener.class);
@@ -42,7 +41,8 @@ public class TestPlanExecutionListener implements TestExecutionListener {
         LOGGER.info("Following testclasses are selected for run:");
         Arrays.asList(plan.getChildren(plan.getRoots()
                 .toArray(new TestIdentifier[0])[0])
-                .toArray(new TestIdentifier[0])).forEach(testIdentifier -> LOGGER.info("-> {}", testIdentifier.getLegacyReportingName()));
+                .toArray(new TestIdentifier[0]))
+                .forEach(testIdentifier -> LOGGER.info("-> {}", testIdentifier.getLegacyReportingName()));
         LOGGER.info("=======================================================================");
         LOGGER.info("=======================================================================");
     }

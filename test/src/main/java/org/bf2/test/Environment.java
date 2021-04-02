@@ -1,10 +1,5 @@
 package org.bf2.test;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -15,6 +10,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Class which holds environment variables for system tests.
@@ -50,17 +51,25 @@ public class Environment {
     private static final String ENDPOINT_TLS_CERT_ENV = "ENDPOINT_TLS_CERT";
     private static final String ENDPOINT_TLS_KEY_ENV = "ENDPOINT_TLS_KEY";
 
-
     /*
      * Setup constants from env variables or set default
      */
     public static final String SUITE_ROOT = System.getProperty("user.dir");
-    public static final Path LOG_DIR = getOrDefault(LOG_DIR_ENV, Paths::get, Paths.get(SUITE_ROOT, "target", "logs")).resolve("test-run-" + DATE_FORMAT.format(LocalDateTime.now()));
+    public static final Path LOG_DIR = getOrDefault(LOG_DIR_ENV, Paths::get, Paths.get(SUITE_ROOT, "target", "logs"))
+            .resolve("test-run-" + DATE_FORMAT.format(LocalDateTime.now()));
     public static final Path ROOT_PATH = Paths.get(System.getProperty("user.dir")).getParent();
-    public static final Path YAML_OPERATOR_BUNDLE_PATH = getOrDefault(YAML_OPERATOR_BUNDLE_PATH_ENV, Paths::get, Paths.get(ROOT_PATH.toString(), "operator", "src", "main", "kubernetes"));
-    public static final Path YAML_SYNC_BUNDLE_PATH = getOrDefault(YAML_SYNC_BUNDLE_PATH_ENV, Paths::get, Paths.get(ROOT_PATH.toString(), "sync", "target", "kubernetes"));
-    public static final Path CRD_PATH = ROOT_PATH.resolve("api").resolve("target").resolve("classes").resolve("META-INF").resolve("dekorate").resolve("kubernetes.yml");
-    public static final String FLEET_SHARD_IMAGE = getOrDefault(FLEET_SHARD_OPERATOR_IMAGE_ENV, "localhost:5000/bf2/kas-fleetshard-operator:latest");
+    public static final Path YAML_OPERATOR_BUNDLE_PATH = getOrDefault(YAML_OPERATOR_BUNDLE_PATH_ENV, Paths::get,
+            Paths.get(ROOT_PATH.toString(), "operator", "src", "main", "kubernetes"));
+    public static final Path YAML_SYNC_BUNDLE_PATH = getOrDefault(YAML_SYNC_BUNDLE_PATH_ENV, Paths::get,
+            Paths.get(ROOT_PATH.toString(), "sync", "target", "kubernetes"));
+    public static final Path CRD_PATH = ROOT_PATH.resolve("api")
+            .resolve("target")
+            .resolve("classes")
+            .resolve("META-INF")
+            .resolve("dekorate")
+            .resolve("kubernetes.yml");
+    public static final String FLEET_SHARD_IMAGE = getOrDefault(FLEET_SHARD_OPERATOR_IMAGE_ENV,
+            "localhost:5000/bf2/kas-fleetshard-operator:latest");
 
     public static final String BOOTSTRAP_HOST_DOMAIN = getOrDefault(BOOTSTRAP_HOST_DOMAIN_ENV, "my-domain.com");
     public static final String OAUTH_CLIENT_SECRET = getOrDefault(OAUTH_CLIENT_SECRET_ENV, "client_secret");
@@ -72,7 +81,6 @@ public class Environment {
     public static final String OAUTH_TLS_CERT = getOrDefault(OAUTH_TLS_CERT_ENV, "cert");
     public static final String ENDPOINT_TLS_CERT = getOrDefault(ENDPOINT_TLS_CERT_ENV, "cert");
     public static final String ENDPOINT_TLS_KEY = getOrDefault(ENDPOINT_TLS_KEY_ENV, "key");
-
 
     private Environment() {
     }
@@ -87,7 +95,7 @@ public class Environment {
     }
 
     /**
-     * Get value from env or  from config or default and parse it to String data type
+     * Get value from env or from config or default and parse it to String data type
      *
      * @param varName      variable name
      * @param defaultValue default string value
@@ -98,7 +106,7 @@ public class Environment {
     }
 
     /**
-     * Get value from env or  from config or default and parse it to defined type
+     * Get value from env or from config or default and parse it to defined type
      *
      * @param var          env variable name
      * @param converter    converter from string to defined type
@@ -106,11 +114,8 @@ public class Environment {
      * @return value of variable fin defined data type
      */
     private static <T> T getOrDefault(String var, Function<String, T> converter, T defaultValue) {
-        String value = System.getenv(var) != null ?
-                System.getenv(var) :
-                (Objects.requireNonNull(JSON_DATA).get(var) != null ?
-                        JSON_DATA.get(var).asText() :
-                        null);
+        String value = System.getenv(var) != null ? System.getenv(var)
+                : (Objects.requireNonNull(JSON_DATA).get(var) != null ? JSON_DATA.get(var).asText() : null);
         T returnValue = defaultValue;
         if (value != null) {
             returnValue = converter.apply(value);
@@ -125,8 +130,9 @@ public class Environment {
      * @return json object with loaded variables
      */
     private static JsonNode loadConfigurationFile() {
-        config = System.getenv().getOrDefault(CONFIG_FILE_PATH_ENV,
-                Paths.get(System.getProperty("user.dir"), "config.json").toAbsolutePath().toString());
+        config = System.getenv()
+                .getOrDefault(CONFIG_FILE_PATH_ENV,
+                        Paths.get(System.getProperty("user.dir"), "config.json").toAbsolutePath().toString());
         ObjectMapper mapper = new ObjectMapper();
         try {
             File jsonFile = new File(config).getAbsoluteFile();

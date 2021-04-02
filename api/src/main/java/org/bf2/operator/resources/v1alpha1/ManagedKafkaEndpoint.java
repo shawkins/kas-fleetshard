@@ -5,12 +5,12 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 /**
- * Defines the endpoint related information used for reaching the ManagedKafka instance
+ * Defines the endpoint related information used for reaching the ManagedKafka
+ * instance
  */
 @Buildable(
         builderPackage = "io.fabric8.kubernetes.api.builder",
-        editableEnabled = false
-)
+        editableEnabled = false)
 @ToString
 @EqualsAndHashCode
 public class ManagedKafkaEndpoint {

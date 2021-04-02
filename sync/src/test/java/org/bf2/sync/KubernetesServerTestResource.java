@@ -15,7 +15,8 @@ import io.quarkus.test.common.QuarkusTestResourceLifecycleManager;
  *
  * Adapted from KubernetesMockServerTestResource
  *
- * Logged https://github.com/quarkusio/quarkus/issues/14744 just in case it's of interest more broadly.
+ * Logged https://github.com/quarkusio/quarkus/issues/14744 just in case it's of
+ * interest more broadly.
  */
 public class KubernetesServerTestResource implements QuarkusTestResourceLifecycleManager {
 
@@ -52,10 +53,14 @@ public class KubernetesServerTestResource implements QuarkusTestResourceLifecycl
     public void configureServer(KubernetesServer mockServer) {
         // initialize with the crd
         try (NamespacedKubernetesClient client = server.getClient()) {
-            client.load(KubernetesServerTestResource.class.getResourceAsStream("/META-INF/dekorate/kubernetes.yml")).get().forEach(crd -> {
-                client.apiextensions().v1beta1().customResourceDefinitions()
-                        .createOrReplace((CustomResourceDefinition) crd);
-            });
+            client.load(KubernetesServerTestResource.class.getResourceAsStream("/META-INF/dekorate/kubernetes.yml"))
+                    .get()
+                    .forEach(crd -> {
+                        client.apiextensions()
+                                .v1beta1()
+                                .customResourceDefinitions()
+                                .createOrReplace((CustomResourceDefinition) crd);
+                    });
         }
     }
 
@@ -68,7 +73,7 @@ public class KubernetesServerTestResource implements QuarkusTestResourceLifecycl
 
     @Override
     public void inject(Object testInstance) {
-        //no annotation
+        // no annotation
     }
 
     protected boolean useHttps() {

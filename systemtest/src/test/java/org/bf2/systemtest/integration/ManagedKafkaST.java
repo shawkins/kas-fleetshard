@@ -1,8 +1,11 @@
 package org.bf2.systemtest.integration;
 
-import io.fabric8.kubernetes.api.model.NamespaceBuilder;
-import io.strimzi.api.kafka.KafkaList;
-import io.strimzi.api.kafka.model.Kafka;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.time.Duration;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.bf2.operator.resources.v1alpha1.ManagedKafka;
@@ -17,11 +20,9 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.extension.ExtensionContext;
 
-import java.time.Duration;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import io.fabric8.kubernetes.api.model.NamespaceBuilder;
+import io.strimzi.api.kafka.KafkaList;
+import io.strimzi.api.kafka.model.Kafka;
 
 public class ManagedKafkaST extends AbstractST {
     private static final Logger LOGGER = LogManager.getLogger(ManagedKafkaST.class);
@@ -46,7 +47,8 @@ public class ManagedKafkaST extends AbstractST {
         var kafkacli = kube.client().customResources(Kafka.class, KafkaList.class);
 
         LOGGER.info("Create namespace");
-        resourceManager.createResource(extensionContext, new NamespaceBuilder().withNewMetadata().withName(mkAppName).endMetadata().build());
+        resourceManager.createResource(extensionContext,
+                new NamespaceBuilder().withNewMetadata().withName(mkAppName).endMetadata().build());
 
         LOGGER.info("Create managedkafka");
         ManagedKafka mk = ManagedKafkaResourceType.getDefault(mkAppName, mkAppName);
@@ -72,7 +74,8 @@ public class ManagedKafkaST extends AbstractST {
         var kafkacli = kube.client().customResources(Kafka.class, KafkaList.class);
 
         LOGGER.info("Create namespace");
-        resourceManager.createResource(extensionContext, new NamespaceBuilder().withNewMetadata().withName(mkAppName).endMetadata().build());
+        resourceManager.createResource(extensionContext,
+                new NamespaceBuilder().withNewMetadata().withName(mkAppName).endMetadata().build());
 
         LOGGER.info("Create managedkafka");
         ManagedKafka mk = ManagedKafkaResourceType.getDefault(mkAppName, mkAppName);
@@ -82,7 +85,7 @@ public class ManagedKafkaST extends AbstractST {
         resourceManager.deleteResource(mk);
 
         LOGGER.info("Create managedkafka again");
-        //added more timeout because of strimzi reconcile interval
+        // added more timeout because of strimzi reconcile interval
         resourceManager.createResource(extensionContext, TimeoutBudget.ofDuration(Duration.ofMinutes(15)), mk);
 
         assertTrue(ManagedKafkaResourceType.getOperation().inAnyNamespace().list().getItems().size() > 0);

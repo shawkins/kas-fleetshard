@@ -4,16 +4,17 @@
  */
 package org.bf2.test.k8s.cmdClient;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import org.bf2.test.executor.ExecResult;
+import static java.util.Arrays.asList;
+import static java.util.stream.Collectors.toList;
 
 import java.io.File;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 
-import static java.util.Arrays.asList;
-import static java.util.stream.Collectors.toList;
+import org.bf2.test.executor.ExecResult;
+
+import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * Abstraction for a kubernetes client.
@@ -102,7 +103,8 @@ public interface KubeCmdClient<K extends KubeCmdClient<K>> {
     ExecResult execInCurrentNamespace(boolean logToOutput, String... commands);
 
     /**
-     * Execute the given {@code command} in the given {@code container} which is deployed in {@code pod}.
+     * Execute the given {@code command} in the given {@code container} which is
+     * deployed in {@code pod}.
      *
      * @param pod       The pod
      * @param container The container
@@ -122,7 +124,8 @@ public interface KubeCmdClient<K extends KubeCmdClient<K>> {
     ExecResult exec(String... command);
 
     /**
-     * Execute the given {@code command}. You can specify if potential failure will thrown the exception or not.
+     * Execute the given {@code command}. You can specify if potential failure will
+     * thrown the exception or not.
      *
      * @param throwError parameter which control thrown exception in case of failure
      * @param command    The command
@@ -131,9 +134,11 @@ public interface KubeCmdClient<K extends KubeCmdClient<K>> {
     ExecResult exec(boolean throwError, String... command);
 
     /**
-     * Execute the given {@code command}. You can specify if potential failure will thrown the exception or not.
+     * Execute the given {@code command}. You can specify if potential failure will
+     * thrown the exception or not.
      *
-     * @param throwError  parameter which control thrown exception in case of failure
+     * @param throwError  parameter which control thrown exception in case of
+     *                    failure
      * @param command     The command
      * @param logToOutput determines if we want to print whole output of command
      * @return The process result.
@@ -141,7 +146,8 @@ public interface KubeCmdClient<K extends KubeCmdClient<K>> {
     ExecResult exec(boolean throwError, boolean logToOutput, String... command);
 
     /**
-     * Wait for the resource with the given {@code name} to be reach the state defined by the predicate.
+     * Wait for the resource with the given {@code name} to be reach the state
+     * defined by the predicate.
      *
      * @param resource  The resource type.
      * @param name      The resource name.
@@ -160,7 +166,8 @@ public interface KubeCmdClient<K extends KubeCmdClient<K>> {
     K waitForResourceCreation(String resourceType, String resourceName);
 
     /**
-     * Get the content of the given {@code resource} with the given {@code name} as YAML.
+     * Get the content of the given {@code resource} with the given {@code name} as
+     * YAML.
      *
      * @param resource     The type of resource (e.g. "cm").
      * @param resourceName The name of the resource.
@@ -196,7 +203,8 @@ public interface KubeCmdClient<K extends KubeCmdClient<K>> {
     /**
      * @param resourceType The type of resource
      * @param resourceName The name of resource
-     * @param sinceSeconds Return logs newer than a relative duration like 5s, 2m, or 3h.
+     * @param sinceSeconds Return logs newer than a relative duration like 5s, 2m,
+     *                     or 3h.
      * @param grepPattern  Grep patterns for search
      * @return Grep result as string
      */
@@ -206,11 +214,13 @@ public interface KubeCmdClient<K extends KubeCmdClient<K>> {
      * @param resourceType      The type of resource
      * @param resourceName      The name of resource
      * @param resourceContainer The name of resource container
-     * @param sinceSeconds      Return logs newer than a relative duration like 5s, 2m, or 3h.
+     * @param sinceSeconds      Return logs newer than a relative duration like 5s,
+     *                          2m, or 3h.
      * @param grepPattern       Grep patterns for search
      * @return Grep result as string
      */
-    String searchInLog(String resourceType, String resourceName, String resourceContainer, long sinceSeconds, String... grepPattern);
+    String searchInLog(String resourceType, String resourceName, String resourceContainer, long sinceSeconds,
+            String... grepPattern);
 
     String getResourceAsJson(String resourceType, String resourceName);
 

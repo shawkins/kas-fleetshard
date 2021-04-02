@@ -1,9 +1,6 @@
 package org.bf2.test.executor;
 
-import io.fabric8.kubernetes.api.model.EnvVar;
-import org.bf2.test.k8s.KubeClusterException;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import static java.lang.String.join;
 
 import java.io.File;
 import java.io.IOException;
@@ -29,7 +26,11 @@ import java.util.concurrent.TimeoutException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static java.lang.String.join;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.bf2.test.k8s.KubeClusterException;
+
+import io.fabric8.kubernetes.api.model.EnvVar;
 
 public class Exec {
     private static final Logger LOGGER = LogManager.getLogger(Exec.class);
@@ -63,7 +64,6 @@ public class Exec {
     public static ExecBuilder builder() {
         return new ExecBuilder();
     }
-
 
     /**
      * Getter for stdOutput
@@ -157,10 +157,10 @@ public class Exec {
      * @param throwErrors throw error if exec fail
      * @return results
      */
-    public static ExecResult exec(String input, List<String> command, int timeout, boolean logToOutput, boolean throwErrors) {
+    public static ExecResult exec(String input, List<String> command, int timeout, boolean logToOutput,
+            boolean throwErrors) {
         return exec(input, command, Collections.emptySet(), timeout, logToOutput, throwErrors);
     }
-
 
     /**
      * Method executes external command
@@ -172,7 +172,8 @@ public class Exec {
      * @param throwErrors look for errors in output and throws exception if true
      * @return execution results
      */
-    public static ExecResult exec(String input, List<String> command, Set<EnvVar> envVars, int timeout, boolean logToOutput, boolean throwErrors) {
+    public static ExecResult exec(String input, List<String> command, Set<EnvVar> envVars, int timeout,
+            boolean logToOutput, boolean throwErrors) {
         int ret = 1;
         ExecResult execResult;
         try {
@@ -198,21 +199,22 @@ public class Exec {
             execResult = new ExecResult(ret, executor.out(), executor.err());
 
             if (throwErrors && ret != 0) {
-                String msg = "`" + join(" ", command) + "` got status code " + ret + " and stderr:\n------\n" + executor.stdErr + "\n------\nand stdout:\n------\n" + executor.stdOut + "\n------";
+                String msg = "`" + join(" ", command) + "` got status code " + ret + " and stderr:\n------\n"
+                        + executor.stdErr + "\n------\nand stdout:\n------\n" + executor.stdOut + "\n------";
 
                 Matcher matcher = ERROR_PATTERN.matcher(executor.err());
                 KubeClusterException t = null;
 
                 if (matcher.find()) {
                     switch (matcher.group(1)) {
-                        case "NotFound":
-                            t = new KubeClusterException.NotFound(execResult, msg);
-                            break;
-                        case "AlreadyExists":
-                            t = new KubeClusterException.AlreadyExists(execResult, msg);
-                            break;
-                        default:
-                            break;
+                    case "NotFound":
+                        t = new KubeClusterException.NotFound(execResult, msg);
+                        break;
+                    case "AlreadyExists":
+                        t = new KubeClusterException.AlreadyExists(execResult, msg);
+                        break;
+                    default:
+                        break;
                     }
                 }
                 matcher = INVALID_PATTERN.matcher(executor.err());
@@ -245,7 +247,8 @@ public class Exec {
      * @throws InterruptedException
      * @throws ExecutionException
      */
-    public int execute(String input, List<String> commands, Set<EnvVar> envVars, long timeoutMs) throws IOException, InterruptedException, ExecutionException {
+    public int execute(String input, List<String> commands, Set<EnvVar> envVars, long timeoutMs)
+            throws IOException, InterruptedException, ExecutionException {
         LOGGER.trace("Running command - " + join(" ", commands.toArray(new String[0])));
         ProcessBuilder builder = new ProcessBuilder();
         builder.command(commands);
@@ -355,14 +358,16 @@ public class Exec {
     }
 
     /**
-     * This method check the size of executor output log and cut it if it's too long.
+     * This method check the size of executor output log and cut it if it's too
+     * long.
      *
      * @param log executor log
      * @return updated log if size is too big
      */
     public static String cutExecutorLog(String log) {
         if (log.length() > MAXIMUM_EXEC_LOG_CHARACTER_SIZE) {
-            LOGGER.warn("Executor log is too long. Going to strip it and print only first {} characters", MAXIMUM_EXEC_LOG_CHARACTER_SIZE);
+            LOGGER.warn("Executor log is too long. Going to strip it and print only first {} characters",
+                    MAXIMUM_EXEC_LOG_CHARACTER_SIZE);
             return log.substring(0, MAXIMUM_EXEC_LOG_CHARACTER_SIZE);
         }
         return log;

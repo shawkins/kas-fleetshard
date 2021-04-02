@@ -36,22 +36,22 @@ public class KafkaCluster extends AbstractKafkaCluster {
 
         Kafka kafka = builder
                 .editOrNewMetadata()
-                    .withName(kafkaClusterName(managedKafka))
-                    .withNamespace(kafkaClusterNamespace(managedKafka))
-                    .withLabels(getLabels())
+                .withName(kafkaClusterName(managedKafka))
+                .withNamespace(kafkaClusterNamespace(managedKafka))
+                .withLabels(getLabels())
                 .endMetadata()
                 .editOrNewSpec()
-                    .editOrNewKafka()
-                        .withVersion(managedKafka.getSpec().getVersions().getKafka())
-                        .withReplicas(3)
-                        .withListeners(getListeners())
-                        .withStorage(getStorage())
-                        .withConfig(getKafkaConfig(managedKafka))
-                    .endKafka()
-                    .editOrNewZookeeper()
-                        .withReplicas(3)
-                        .withStorage((SingleVolumeStorage)getStorage())
-                    .endZookeeper()
+                .editOrNewKafka()
+                .withVersion(managedKafka.getSpec().getVersions().getKafka())
+                .withReplicas(3)
+                .withListeners(getListeners())
+                .withStorage(getStorage())
+                .withConfig(getKafkaConfig(managedKafka))
+                .endKafka()
+                .editOrNewZookeeper()
+                .withReplicas(3)
+                .withStorage((SingleVolumeStorage) getStorage())
+                .endZookeeper()
                 .endSpec()
                 .build();
 
@@ -80,8 +80,8 @@ public class KafkaCluster extends AbstractKafkaCluster {
                                 .withPort(9092)
                                 .withType(KafkaListenerType.INTERNAL)
                                 .withTls(false)
-                                .build()
-                ).build();
+                                .build())
+                .build();
     }
 
     private Storage getStorage() {

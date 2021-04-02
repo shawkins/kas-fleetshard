@@ -41,10 +41,10 @@ public class MockControlPlane implements ControlPlaneApi {
     @Inject
     Logger log;
 
-    @ConfigProperty(name="sync.mock-control-plane.simulate", defaultValue = "false")
+    @ConfigProperty(name = "sync.mock-control-plane.simulate", defaultValue = "false")
     boolean runSimulation;
 
-    @ConfigProperty(name="sync.mock-control-plane.max", defaultValue = "3")
+    @ConfigProperty(name = "sync.mock-control-plane.max", defaultValue = "3")
     int maxKafkas;
 
     // current active clusters
@@ -85,7 +85,7 @@ public class MockControlPlane implements ControlPlaneApi {
         if (this.kafkas.size() > 1 && random.nextBoolean()) {
             int idx = Math.abs(random.nextInt(this.kafkas.size()));
             int i = 0;
-            for (ManagedKafka k:kafkas.values()) {
+            for (ManagedKafka k : kafkas.values()) {
                 if (i++ < idx) {
                     continue;
                 } else {
@@ -103,7 +103,7 @@ public class MockControlPlane implements ControlPlaneApi {
         }
 
         log.info("--------------------------------------------------");
-        for(ManagedKafka mk:this.kafkas.values()) {
+        for (ManagedKafka mk : this.kafkas.values()) {
             log.infof("ManagedKafka: %s, delete requested: %s", mk.getId(), mk.getSpec().isDeleted());
         }
         log.info("--------------------------------------------------");
@@ -124,11 +124,12 @@ public class MockControlPlane implements ControlPlaneApi {
             return false;
         }
         return ConditionUtils.findManagedKafkaCondition(status.getConditions(), Type.Ready)
-                .filter(c -> Reason.Deleted.name().equals(c.getReason())).isPresent();
+                .filter(c -> Reason.Deleted.name().equals(c.getReason()))
+                .isPresent();
     }
 
     @Override
-    public void updateStatus(@PathParam("id") String id, ManagedKafkaAgentStatus status){
+    public void updateStatus(@PathParam("id") String id, ManagedKafkaAgentStatus status) {
         log.infof("control plane::updateAgentStatus (capacity) <- Received %s", status);
         this.agentStatus = status;
     }
@@ -140,7 +141,8 @@ public class MockControlPlane implements ControlPlaneApi {
     }
 
     @Override
-    public void updateKafkaClustersStatus(@PathParam(value = "id") String id, Map<String, ManagedKafkaStatus> statusMap) {
+    public void updateKafkaClustersStatus(@PathParam(value = "id") String id,
+            Map<String, ManagedKafkaStatus> statusMap) {
         log.infof("control plane:: updateKafkaClustersStatus <- Received from cluster %s, %s", id, statusMap);
 
         // clean up the deleted

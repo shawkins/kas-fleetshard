@@ -1,20 +1,21 @@
 package org.bf2.operator.operands;
 
-import io.fabric8.kubernetes.api.model.Secret;
-import io.fabric8.kubernetes.api.model.SecretBuilder;
-import io.fabric8.kubernetes.client.KubernetesClient;
-import io.fabric8.kubernetes.client.dsl.Resource;
-
-import org.bf2.operator.InformerManager;
-import org.bf2.operator.resources.v1alpha1.ObservabilityConfiguration;
-
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+
+import org.bf2.operator.InformerManager;
+import org.bf2.operator.resources.v1alpha1.ObservabilityConfiguration;
+
+import io.fabric8.kubernetes.api.model.Secret;
+import io.fabric8.kubernetes.api.model.SecretBuilder;
+import io.fabric8.kubernetes.client.KubernetesClient;
+import io.fabric8.kubernetes.client.dsl.Resource;
 
 @ApplicationScoped
 public class ObservabilityManager {
@@ -50,16 +51,17 @@ public class ObservabilityManager {
         }
         return new SecretBuilder()
                 .withNewMetadata()
-                    .withNamespace(namespace)
-                    .withName(OBSERVABILITY_SECRET_NAME)
-                    .addToLabels("configures", "observability-operator")
-                    .addToLabels(OperandUtils.getDefaultLabels())
+                .withNamespace(namespace)
+                .withName(OBSERVABILITY_SECRET_NAME)
+                .addToLabels("configures", "observability-operator")
+                .addToLabels(OperandUtils.getDefaultLabels())
                 .endMetadata()
                 .addToData(data);
     }
 
     static boolean isObservabilityStatusAccepted(Secret cm) {
-        Map<String, String> annotations = Objects.requireNonNullElse(cm.getMetadata().getAnnotations(), Collections.emptyMap());
+        Map<String, String> annotations = Objects.requireNonNullElse(cm.getMetadata().getAnnotations(),
+                Collections.emptyMap());
         String status = annotations.get(OBSERVABILITY_OPERATOR_STATUS);
         return ACCEPTED.equalsIgnoreCase(status);
     }

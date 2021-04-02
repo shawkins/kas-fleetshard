@@ -9,7 +9,8 @@ import org.junit.jupiter.api.Test;
 
 public class ManagedKafkaSpecTest {
 
-    @Test public void testEquals() {
+    @Test
+    public void testEquals() {
         ManagedKafkaSpec spec1 = new ManagedKafkaSpec();
         ManagedKafkaSpec spec2 = new ManagedKafkaSpec();
         // if it's not equals, then the default equality is being used

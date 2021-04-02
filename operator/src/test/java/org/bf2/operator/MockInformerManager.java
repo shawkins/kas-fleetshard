@@ -15,8 +15,8 @@ import io.quarkus.test.Mock;
 import io.strimzi.api.kafka.model.Kafka;
 
 /**
- * To bypass the informer async update, we can lookup directly
- * against the (Mock) server
+ * To bypass the informer async update, we can lookup directly against the
+ * (Mock) server
  */
 @Mock
 @ApplicationScoped

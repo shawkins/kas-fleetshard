@@ -1,5 +1,13 @@
 package org.bf2.operator;
 
+import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.event.Observes;
+import javax.inject.Inject;
+
+import org.bf2.operator.events.ResourceEventSource;
+import org.bf2.operator.operands.OperandUtils;
+import org.jboss.logging.Logger;
+
 import io.fabric8.kubernetes.api.model.ConfigMap;
 import io.fabric8.kubernetes.api.model.ConfigMapList;
 import io.fabric8.kubernetes.api.model.Secret;
@@ -20,13 +28,6 @@ import io.quarkus.runtime.ShutdownEvent;
 import io.quarkus.runtime.StartupEvent;
 import io.strimzi.api.kafka.KafkaList;
 import io.strimzi.api.kafka.model.Kafka;
-import org.bf2.operator.events.ResourceEventSource;
-import org.bf2.operator.operands.OperandUtils;
-import org.jboss.logging.Logger;
-
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.event.Observes;
-import javax.inject.Inject;
 
 @ApplicationScoped
 public class InformerManager {
@@ -66,36 +67,35 @@ public class InformerManager {
     void onStart(@Observes StartupEvent ev) {
         sharedInformerFactory = kubernetesClient.informers();
 
-        OperationContext operationContext =
-                new OperationContext()
-                        .withLabels(OperandUtils.getDefaultLabels())
-                        .withIsNamespaceConfiguredFromGlobalConfig(true);
+        OperationContext operationContext = new OperationContext()
+                .withLabels(OperandUtils.getDefaultLabels())
+                .withIsNamespaceConfiguredFromGlobalConfig(true);
 
         // TODO: should we make the resync time configurable?
 
-        kafkaSharedIndexInformer =
-                sharedInformerFactory.sharedIndexInformerFor(Kafka.class, KafkaList.class, operationContext, 60 * 1000L);
+        kafkaSharedIndexInformer = sharedInformerFactory.sharedIndexInformerFor(Kafka.class, KafkaList.class,
+                operationContext, 60 * 1000L);
         kafkaSharedIndexInformer.addEventHandler(kafkaEventSource);
 
-        deploymentSharedIndexInformer =
-                sharedInformerFactory.sharedIndexInformerFor(Deployment.class, DeploymentList.class, operationContext, 60 * 1000L);
+        deploymentSharedIndexInformer = sharedInformerFactory.sharedIndexInformerFor(Deployment.class,
+                DeploymentList.class, operationContext, 60 * 1000L);
         deploymentSharedIndexInformer.addEventHandler(deploymentEventSource);
 
-        serviceSharedIndexInformer =
-                sharedInformerFactory.sharedIndexInformerFor(Service.class, ServiceList.class, operationContext, 60 * 1000L);
+        serviceSharedIndexInformer = sharedInformerFactory.sharedIndexInformerFor(Service.class, ServiceList.class,
+                operationContext, 60 * 1000L);
         serviceSharedIndexInformer.addEventHandler(serviceEventSource);
 
-        configMapSharedIndexInformer =
-                sharedInformerFactory.sharedIndexInformerFor(ConfigMap.class, ConfigMapList.class, operationContext, 60 * 1000L);
+        configMapSharedIndexInformer = sharedInformerFactory.sharedIndexInformerFor(ConfigMap.class,
+                ConfigMapList.class, operationContext, 60 * 1000L);
         configMapSharedIndexInformer.addEventHandler(configMapEventSource);
 
-        secretSharedIndexInformer =
-                sharedInformerFactory.sharedIndexInformerFor(Secret.class, SecretList.class, operationContext, 60 * 1000L);
+        secretSharedIndexInformer = sharedInformerFactory.sharedIndexInformerFor(Secret.class, SecretList.class,
+                operationContext, 60 * 1000L);
         secretSharedIndexInformer.addEventHandler(secretEventSource);
 
         if (isOpenShift()) {
-            routeSharedIndexInformer =
-                    sharedInformerFactory.sharedIndexInformerFor(Route.class, RouteList.class, operationContext, 60 * 1000L);
+            routeSharedIndexInformer = sharedInformerFactory.sharedIndexInformerFor(Route.class, RouteList.class,
+                    operationContext, 60 * 1000L);
             routeSharedIndexInformer.addEventHandler(routeEventSource);
         }
 

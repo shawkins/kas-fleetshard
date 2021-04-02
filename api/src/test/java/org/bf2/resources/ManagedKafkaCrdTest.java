@@ -1,24 +1,25 @@
 package org.bf2.resources;
 
-import io.fabric8.kubernetes.api.model.HasMetadata;
-import io.fabric8.kubernetes.api.model.ObjectMetaBuilder;
-import io.fabric8.kubernetes.api.model.apiextensions.v1beta1.CustomResourceDefinition;
-import io.fabric8.kubernetes.client.Config;
-import io.fabric8.kubernetes.client.KubernetesClient;
-import io.fabric8.kubernetes.client.server.mock.EnableKubernetesMockClient;
-import org.bf2.operator.resources.v1alpha1.ManagedKafka;
-import org.bf2.operator.resources.v1alpha1.ManagedKafkaBuilder;
-import org.bf2.operator.resources.v1alpha1.ManagedKafkaSpecBuilder;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import org.bf2.operator.resources.v1alpha1.ManagedKafka;
+import org.bf2.operator.resources.v1alpha1.ManagedKafkaBuilder;
+import org.bf2.operator.resources.v1alpha1.ManagedKafkaSpecBuilder;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+
+import io.fabric8.kubernetes.api.model.HasMetadata;
+import io.fabric8.kubernetes.api.model.ObjectMetaBuilder;
+import io.fabric8.kubernetes.api.model.apiextensions.v1beta1.CustomResourceDefinition;
+import io.fabric8.kubernetes.client.Config;
+import io.fabric8.kubernetes.client.KubernetesClient;
+import io.fabric8.kubernetes.client.server.mock.EnableKubernetesMockClient;
 
 @EnableKubernetesMockClient(https = false, crud = true)
 public class ManagedKafkaCrdTest {
@@ -35,18 +36,27 @@ public class ManagedKafkaCrdTest {
         System.setProperty(Config.KUBERNETES_TRUST_CERT_SYSTEM_PROPERTY, "true");
     }
 
-
     @Test
     void testRegisterCrds() throws IOException {
-        //load all crds
-        List<HasMetadata> crdList = client.load(new FileInputStream(Paths.get(ROOT_PATH, "target", "classes", "META-INF", "dekorate", "kubernetes.yml").toString())).get();
+        // load all crds
+        List<HasMetadata> crdList = client
+                .load(new FileInputStream(
+                        Paths.get(ROOT_PATH, "target", "classes", "META-INF", "dekorate", "kubernetes.yml").toString()))
+                .get();
 
         for (HasMetadata crd : crdList) {
-            CustomResourceDefinition created = client.apiextensions().v1beta1().customResourceDefinitions().createOrReplace((CustomResourceDefinition) crd);
+            CustomResourceDefinition created = client.apiextensions()
+                    .v1beta1()
+                    .customResourceDefinitions()
+                    .createOrReplace((CustomResourceDefinition) crd);
             assertNotNull(created);
             assertEquals(crd.getMetadata().getName(), created.getMetadata().getName());
             assertNotNull(created.getSpec().getValidation().getOpenAPIV3Schema());
-            assertNotNull(client.apiextensions().v1beta1().customResourceDefinitions().withName(created.getMetadata().getName()).get());
+            assertNotNull(client.apiextensions()
+                    .v1beta1()
+                    .customResourceDefinitions()
+                    .withName(created.getMetadata().getName())
+                    .get());
         }
     }
 
@@ -61,33 +71,33 @@ public class ManagedKafkaCrdTest {
                 .withSpec(
                         new ManagedKafkaSpecBuilder()
                                 .withNewVersions()
-                                    .withKafka("2.6.0")
-                                    .withStrimzi("0.21.1")
+                                .withKafka("2.6.0")
+                                .withStrimzi("0.21.1")
                                 .endVersions()
                                 .withNewCapacity()
-                                    .withNewIngressEgressThroughputPerSec("4Mi")
-                                    .withNewMaxDataRetentionPeriod("P14D")
-                                    .withNewMaxDataRetentionSize("100Gi")
-                                    .withTotalMaxConnections(500)
-                                    .withMaxPartitions(100)
+                                .withNewIngressEgressThroughputPerSec("4Mi")
+                                .withNewMaxDataRetentionPeriod("P14D")
+                                .withNewMaxDataRetentionSize("100Gi")
+                                .withTotalMaxConnections(500)
+                                .withMaxPartitions(100)
                                 .endCapacity()
                                 .withNewEndpoint()
-                                    .withNewBootstrapServerHost("")
-                                    .withNewTls()
-                                        .withNewCert("cert")
-                                        .withNewKey("key")
-                                    .endTls()
+                                .withNewBootstrapServerHost("")
+                                .withNewTls()
+                                .withNewCert("cert")
+                                .withNewKey("key")
+                                .endTls()
                                 .endEndpoint()
                                 .withNewOauth()
-                                    .withClientId("clientID")
-                                    .withNewTlsTrustedCertificate("cert")
-                                    .withClientSecret("secret")
-                                    .withUserNameClaim("userClaim")
-                                    .withCustomClaimCheck("customClaim")
-                                    .withNewTokenEndpointURI("tokenEndpointURI")
-                                    .withNewJwksEndpointURI("jwksEndpointURI")
-                                    .withNewTokenEndpointURI("tokenUri")
-                                    .withNewValidIssuerEndpointURI("issuer")
+                                .withClientId("clientID")
+                                .withNewTlsTrustedCertificate("cert")
+                                .withClientSecret("secret")
+                                .withUserNameClaim("userClaim")
+                                .withCustomClaimCheck("customClaim")
+                                .withNewTokenEndpointURI("tokenEndpointURI")
+                                .withNewJwksEndpointURI("jwksEndpointURI")
+                                .withNewTokenEndpointURI("tokenUri")
+                                .withNewValidIssuerEndpointURI("issuer")
                                 .endOauth()
                                 .build())
                 .build();

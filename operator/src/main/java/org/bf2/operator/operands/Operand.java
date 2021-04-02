@@ -4,7 +4,9 @@ import io.fabric8.kubernetes.client.CustomResource;
 import io.javaoperatorsdk.operator.api.Context;
 
 /**
- * Define common behaviour across operands related to a controller handling a specific custom resource
+ * Define common behaviour across operands related to a controller handling a
+ * specific custom resource
+ * 
  * @param <T> custom resource type handled by corresponding controller
  */
 public interface Operand<T extends CustomResource<?, ?>> {
@@ -20,7 +22,7 @@ public interface Operand<T extends CustomResource<?, ?>> {
      * Delete the operand instance based on the custom resource
      *
      * @param customResource custom resource
-     * @param context current context
+     * @param context        current context
      */
     void delete(T customResource, Context<T> context);
 

@@ -10,9 +10,9 @@ import io.fabric8.kubernetes.client.informers.ResourceEventHandler;
 import io.fabric8.kubernetes.client.informers.cache.Cache;
 
 /**
- * Simple generic handler.  The consumer should be non-blocking.
+ * Simple generic handler. The consumer should be non-blocking.
  */
-final class CustomResourceEventHandler<T extends CustomResource<?,?>> implements ResourceEventHandler<T> {
+final class CustomResourceEventHandler<T extends CustomResource<?, ?>> implements ResourceEventHandler<T> {
 
     static Logger log = Logger.getLogger(CustomResourceEventHandler.class);
 
@@ -22,7 +22,7 @@ final class CustomResourceEventHandler<T extends CustomResource<?,?>> implements
         this.consumer = consumer;
     }
 
-    public static <T extends CustomResource<?,?>> CustomResourceEventHandler<T> of(BiConsumer<T, T> consumer) {
+    public static <T extends CustomResource<?, ?>> CustomResourceEventHandler<T> of(BiConsumer<T, T> consumer) {
         return new CustomResourceEventHandler<T>(consumer);
     }
 

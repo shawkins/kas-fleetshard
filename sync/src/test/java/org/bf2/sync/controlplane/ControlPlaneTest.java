@@ -11,7 +11,8 @@ import org.junit.jupiter.api.Test;
 
 public class ControlPlaneTest {
 
-    @Test public void testManagedKafkaStatusComparison() {
+    @Test
+    public void testManagedKafkaStatusComparison() {
         ManagedKafkaStatus status = null;
         assertFalse(ControlPlane.statusChanged(status, status));
 

@@ -1,5 +1,14 @@
 package org.bf2.operator.operands;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
+import javax.enterprise.context.ApplicationScoped;
+
+import org.bf2.operator.resources.v1alpha1.ManagedKafka;
+
 import io.fabric8.kubernetes.api.model.Container;
 import io.fabric8.kubernetes.api.model.ContainerBuilder;
 import io.fabric8.kubernetes.api.model.ContainerPort;
@@ -12,17 +21,10 @@ import io.fabric8.kubernetes.api.model.ResourceRequirementsBuilder;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
 import io.fabric8.kubernetes.api.model.apps.DeploymentBuilder;
 import io.quarkus.arc.DefaultBean;
-import org.bf2.operator.resources.v1alpha1.ManagedKafka;
-
-import javax.enterprise.context.ApplicationScoped;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
 
 /**
- * Provides same functionalities to get a Canary deployment from a ManagedKafka one
- * and checking the corresponding status
+ * Provides same functionalities to get a Canary deployment from a ManagedKafka
+ * one and checking the corresponding status
  */
 @ApplicationScoped
 @DefaultBean
@@ -41,27 +43,28 @@ public class Canary extends AbstractCanary {
 
         Deployment deployment = builder
                 .editOrNewMetadata()
-                    .withName(canaryName)
-                    .withNamespace(canaryNamespace(managedKafka))
-                    .withLabels(getLabels(canaryName))
+                .withName(canaryName)
+                .withNamespace(canaryNamespace(managedKafka))
+                .withLabels(getLabels(canaryName))
                 .endMetadata()
                 .editOrNewSpec()
-                    .withReplicas(1)
-                    .editOrNewSelector()
-                        .withMatchLabels(getLabels(canaryName))
-                    .endSelector()
-                    .editOrNewTemplate()
-                        .editOrNewMetadata()
-                            .withLabels(getLabels(canaryName))
-                        .endMetadata()
-                        .editOrNewSpec()
-                            .withContainers(getContainers(managedKafka))
-                        .endSpec()
-                    .endTemplate()
+                .withReplicas(1)
+                .editOrNewSelector()
+                .withMatchLabels(getLabels(canaryName))
+                .endSelector()
+                .editOrNewTemplate()
+                .editOrNewMetadata()
+                .withLabels(getLabels(canaryName))
+                .endMetadata()
+                .editOrNewSpec()
+                .withContainers(getContainers(managedKafka))
+                .endSpec()
+                .endTemplate()
                 .endSpec()
                 .build();
 
-        // setting the ManagedKafka has owner of the Canary deployment resource is needed
+        // setting the ManagedKafka has owner of the Canary deployment resource is
+        // needed
         // by the operator sdk to handle events on the Deployment resource properly
         OperandUtils.setAsOwner(managedKafka, deployment);
 
@@ -91,13 +94,16 @@ public class Canary extends AbstractCanary {
 
     private List<EnvVar> getEnvVar(ManagedKafka managedKafka) {
         List<EnvVar> envVars = new ArrayList<>(2);
-        envVars.add(new EnvVarBuilder().withName("KAFKA_BOOTSTRAP_SERVERS").withValue(managedKafka.getMetadata().getName() + "-kafka-bootstrap:9092").build());
+        envVars.add(new EnvVarBuilder().withName("KAFKA_BOOTSTRAP_SERVERS")
+                .withValue(managedKafka.getMetadata().getName() + "-kafka-bootstrap:9092")
+                .build());
         envVars.add(new EnvVarBuilder().withName("RECONCILE_INTERVAL_MS").withValue("5000").build());
         return envVars;
     }
 
     private List<ContainerPort> getContainerPorts() {
-        return Collections.singletonList(new ContainerPortBuilder().withName("metrics").withContainerPort(8080).build());
+        return Collections
+                .singletonList(new ContainerPortBuilder().withName("metrics").withContainerPort(8080).build());
     }
 
     private ResourceRequirements getResources() {

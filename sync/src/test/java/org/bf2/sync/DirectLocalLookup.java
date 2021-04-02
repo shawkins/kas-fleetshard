@@ -14,8 +14,8 @@ import io.fabric8.kubernetes.client.KubernetesClient;
 import io.quarkus.test.Mock;
 
 /**
- * To bypass the informer async update, we can lookup directly
- * against the (Mock) server
+ * To bypass the informer async update, we can lookup directly against the
+ * (Mock) server
  */
 @Mock
 @ApplicationScoped

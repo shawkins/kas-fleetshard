@@ -1,14 +1,5 @@
 package org.bf2.test;
 
-import io.fabric8.kubernetes.api.model.ContainerStatus;
-import io.fabric8.kubernetes.api.model.Pod;
-import io.fabric8.kubernetes.client.KubernetesClientException;
-import io.fabric8.kubernetes.client.utils.IOHelpers;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.junit.jupiter.api.TestInfo;
-import org.junit.jupiter.api.extension.ExtensionContext;
-
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -25,6 +16,16 @@ import java.nio.file.Paths;
 import java.util.Map;
 import java.util.function.BooleanSupplier;
 import java.util.function.Function;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.junit.jupiter.api.TestInfo;
+import org.junit.jupiter.api.extension.ExtensionContext;
+
+import io.fabric8.kubernetes.api.model.ContainerStatus;
+import io.fabric8.kubernetes.api.model.Pod;
+import io.fabric8.kubernetes.client.KubernetesClientException;
+import io.fabric8.kubernetes.client.utils.IOHelpers;
 
 /**
  * Test utils contains static help methods
@@ -47,7 +48,8 @@ public class TestUtils {
      * @param onTimeout      lambda method which is called when timeout is reached
      * @return
      */
-    public static long waitFor(String description, long pollIntervalMs, long timeoutMs, BooleanSupplier ready, Runnable onTimeout) {
+    public static long waitFor(String description, long pollIntervalMs, long timeoutMs, BooleanSupplier ready,
+            Runnable onTimeout) {
         LOGGER.debug("Waiting for {}", description);
         long deadline = System.currentTimeMillis() + timeoutMs;
         while (true) {
@@ -63,13 +65,15 @@ public class TestUtils {
             }
             if (timeLeft <= 0) {
                 onTimeout.run();
-                WaitException waitException = new WaitException("Timeout after " + timeoutMs + " ms waiting for " + description);
+                WaitException waitException = new WaitException(
+                        "Timeout after " + timeoutMs + " ms waiting for " + description);
                 waitException.printStackTrace();
                 throw waitException;
             }
             long sleepTime = Math.min(pollIntervalMs, timeLeft);
             if (LOGGER.isTraceEnabled()) {
-                LOGGER.trace("{} not ready, will try again in {} ms ({}ms till timeout)", description, sleepTime, timeLeft);
+                LOGGER.trace("{} not ready, will try again in {} ms ({}ms till timeout)", description, sleepTime,
+                        timeLeft);
             }
             try {
                 Thread.sleep(sleepTime);
@@ -83,8 +87,9 @@ public class TestUtils {
         File yamlFile = File.createTempFile("temp-file", ".yaml");
 
         try (InputStream bais = (InputStream) URI.create(url).toURL().openConnection().getContent();
-             BufferedReader br = new BufferedReader(new InputStreamReader(bais, StandardCharsets.UTF_8));
-             OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(yamlFile), StandardCharsets.UTF_8)) {
+                BufferedReader br = new BufferedReader(new InputStreamReader(bais, StandardCharsets.UTF_8));
+                OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(yamlFile),
+                        StandardCharsets.UTF_8)) {
 
             StringBuilder sb = new StringBuilder();
 
@@ -107,7 +112,8 @@ public class TestUtils {
         return null;
     }
 
-    public static File replaceStringInYaml(String pathToOrigin, String originalns, String namespace) throws IOException {
+    public static File replaceStringInYaml(String pathToOrigin, String originalns, String namespace)
+            throws IOException {
         byte[] encoded;
         File yamlFile = File.createTempFile("temp-file", ".yaml");
 
@@ -153,6 +159,7 @@ public class TestUtils {
 
     /**
      * Check all containers state in pod and return boolean status if po is running
+     * 
      * @param p pod
      */
     public static boolean isPodReady(Pod p) {
@@ -160,7 +167,9 @@ public class TestUtils {
     }
 
     /**
-     * Replacer function replacing values in input stream and returns modified input stream
+     * Replacer function replacing values in input stream and returns modified input
+     * stream
+     * 
      * @param values map of values for replace
      */
     public static Function<InputStream, InputStream> replacer(final Map<String, String> values) {

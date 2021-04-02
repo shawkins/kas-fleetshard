@@ -1,10 +1,19 @@
 package org.bf2.operator.operands;
 
-import io.fabric8.kubernetes.api.model.Quantity;
-import io.fabric8.kubernetes.api.model.ResourceRequirements;
-import io.fabric8.kubernetes.api.model.ResourceRequirementsBuilder;
-import io.fabric8.kubernetes.api.model.apps.Deployment;
-import io.fabric8.kubernetes.api.model.apps.DeploymentBuilder;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.event.Observes;
+import javax.inject.Inject;
+
+import org.bf2.operator.resources.v1alpha1.ManagedKafka;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.jboss.logging.Logger;
+
 import io.fabric8.kubernetes.api.model.Container;
 import io.fabric8.kubernetes.api.model.ContainerBuilder;
 import io.fabric8.kubernetes.api.model.ContainerPort;
@@ -12,10 +21,15 @@ import io.fabric8.kubernetes.api.model.ContainerPortBuilder;
 import io.fabric8.kubernetes.api.model.EnvVar;
 import io.fabric8.kubernetes.api.model.EnvVarBuilder;
 import io.fabric8.kubernetes.api.model.IntOrString;
+import io.fabric8.kubernetes.api.model.Quantity;
+import io.fabric8.kubernetes.api.model.ResourceRequirements;
+import io.fabric8.kubernetes.api.model.ResourceRequirementsBuilder;
 import io.fabric8.kubernetes.api.model.Service;
 import io.fabric8.kubernetes.api.model.ServiceBuilder;
 import io.fabric8.kubernetes.api.model.ServicePort;
 import io.fabric8.kubernetes.api.model.ServicePortBuilder;
+import io.fabric8.kubernetes.api.model.apps.Deployment;
+import io.fabric8.kubernetes.api.model.apps.DeploymentBuilder;
 import io.fabric8.kubernetes.client.dsl.Resource;
 import io.fabric8.openshift.api.model.Route;
 import io.fabric8.openshift.api.model.RouteBuilder;
@@ -23,22 +37,10 @@ import io.fabric8.openshift.client.OpenShiftClient;
 import io.javaoperatorsdk.operator.api.Context;
 import io.quarkus.arc.DefaultBean;
 import io.quarkus.runtime.StartupEvent;
-import org.bf2.operator.resources.v1alpha1.ManagedKafka;
-import org.eclipse.microprofile.config.inject.ConfigProperty;
-import org.jboss.logging.Logger;
-
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.event.Observes;
-import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 /**
- * Provides same functionalities to get a AdminServer deployment from a ManagedKafka one
- * and checking the corresponding status
+ * Provides same functionalities to get a AdminServer deployment from a
+ * ManagedKafka one and checking the corresponding status
  */
 @ApplicationScoped
 @DefaultBean
@@ -76,7 +78,8 @@ public class AdminServer extends AbstractAdminServer {
             // Admin Server route resource doesn't exist, has to be created
             if (openShiftClient.routes()
                     .inNamespace(route.getMetadata().getNamespace())
-                    .withName(route.getMetadata().getName()).get() == null) {
+                    .withName(route.getMetadata().getName())
+                    .get() == null) {
                 openShiftClient.routes().inNamespace(route.getMetadata().getNamespace()).create(route);
                 // Admin Server route resource already exists, has to be updated
             } else {
@@ -106,27 +109,28 @@ public class AdminServer extends AbstractAdminServer {
 
         Deployment deployment = builder
                 .editOrNewMetadata()
-                    .withName(adminServerName)
-                    .withNamespace(adminServerNamespace(managedKafka))
-                    .withLabels(getLabels(adminServerName))
+                .withName(adminServerName)
+                .withNamespace(adminServerNamespace(managedKafka))
+                .withLabels(getLabels(adminServerName))
                 .endMetadata()
                 .editOrNewSpec()
-                    .withReplicas(1)
-                    .editOrNewSelector()
-                        .withMatchLabels(getLabels(adminServerName))
-                    .endSelector()
-                    .editOrNewTemplate()
-                        .editOrNewMetadata()
-                            .withLabels(getLabels(adminServerName))
-                        .endMetadata()
-                        .editOrNewSpec()
-                            .withContainers(getContainers(managedKafka))
-                        .endSpec()
-                    .endTemplate()
+                .withReplicas(1)
+                .editOrNewSelector()
+                .withMatchLabels(getLabels(adminServerName))
+                .endSelector()
+                .editOrNewTemplate()
+                .editOrNewMetadata()
+                .withLabels(getLabels(adminServerName))
+                .endMetadata()
+                .editOrNewSpec()
+                .withContainers(getContainers(managedKafka))
+                .endSpec()
+                .endTemplate()
                 .endSpec()
                 .build();
 
-        // setting the ManagedKafka has owner of the Admin Server deployment resource is needed
+        // setting the ManagedKafka has owner of the Admin Server deployment resource is
+        // needed
         // by the operator sdk to handle events on the Deployment resource properly
         OperandUtils.setAsOwner(managedKafka, deployment);
 
@@ -142,17 +146,18 @@ public class AdminServer extends AbstractAdminServer {
 
         Service service = builder
                 .editOrNewMetadata()
-                    .withNamespace(adminServerNamespace(managedKafka))
-                    .withName(adminServerName(managedKafka))
-                    .withLabels(getLabels(adminServerName))
+                .withNamespace(adminServerNamespace(managedKafka))
+                .withName(adminServerName(managedKafka))
+                .withLabels(getLabels(adminServerName))
                 .endMetadata()
                 .editOrNewSpec()
-                    .withSelector(getLabels(adminServerName))
-                    .withPorts(getServicePorts())
+                .withSelector(getLabels(adminServerName))
+                .withPorts(getServicePorts())
                 .endSpec()
                 .build();
 
-        // setting the ManagedKafka has owner of the Admin Server service resource is needed
+        // setting the ManagedKafka has owner of the Admin Server service resource is
+        // needed
         // by the operator sdk to handle events on the Service resource properly
         OperandUtils.setAsOwner(managedKafka, service);
 
@@ -174,28 +179,29 @@ public class AdminServer extends AbstractAdminServer {
 
         Route route = builder
                 .editOrNewMetadata()
-                    .withNamespace(adminServerNamespace(managedKafka))
-                    .withName(adminServerName(managedKafka))
-                    .withLabels(getRouteLabels())
+                .withNamespace(adminServerNamespace(managedKafka))
+                .withName(adminServerName(managedKafka))
+                .withLabels(getRouteLabels())
                 .endMetadata()
                 .editOrNewSpec()
-                    .withNewTo()
-                        .withKind("Service")
-                        .withName(adminServerName)
-                    .endTo()
-                    .withNewPort()
-                        .withTargetPort(new IntOrString("http"))
-                    .endPort()
-                    .withHost("admin-server-" + managedKafka.getSpec().getEndpoint().getBootstrapServerHost())
-                    .withNewTls()
-                        .withTermination("edge")
-                        .withCertificate(tlsCertificate)
-                        .withKey(tlsKey)
-                    .endTls()
+                .withNewTo()
+                .withKind("Service")
+                .withName(adminServerName)
+                .endTo()
+                .withNewPort()
+                .withTargetPort(new IntOrString("http"))
+                .endPort()
+                .withHost("admin-server-" + managedKafka.getSpec().getEndpoint().getBootstrapServerHost())
+                .withNewTls()
+                .withTermination("edge")
+                .withCertificate(tlsCertificate)
+                .withKey(tlsKey)
+                .endTls()
                 .endSpec()
                 .build();
 
-        // setting the ManagedKafka has owner of the Admin Server route resource is needed
+        // setting the ManagedKafka has owner of the Admin Server route resource is
+        // needed
         // by the operator sdk to handle events on the Route resource properly
         OperandUtils.setAsOwner(managedKafka, route);
 
@@ -230,7 +236,9 @@ public class AdminServer extends AbstractAdminServer {
 
     private List<EnvVar> getEnvVar(ManagedKafka managedKafka) {
         List<EnvVar> envVars = new ArrayList<>(1);
-        envVars.add(new EnvVarBuilder().withName("KAFKA_ADMIN_BOOTSTRAP_SERVERS").withValue(managedKafka.getMetadata().getName() + "-kafka-bootstrap:9095").build());
+        envVars.add(new EnvVarBuilder().withName("KAFKA_ADMIN_BOOTSTRAP_SERVERS")
+                .withValue(managedKafka.getMetadata().getName() + "-kafka-bootstrap:9095")
+                .build());
         if (corsAllowList.isPresent()) {
             envVars.add(new EnvVarBuilder().withName("CORS_ALLOW_LIST_REGEX").withValue(corsAllowList.get()).build());
         }
@@ -242,7 +250,11 @@ public class AdminServer extends AbstractAdminServer {
     }
 
     private List<ServicePort> getServicePorts() {
-        return Collections.singletonList(new ServicePortBuilder().withName("http").withProtocol("TCP").withPort(8080).withTargetPort(new IntOrString("http")).build());
+        return Collections.singletonList(new ServicePortBuilder().withName("http")
+                .withProtocol("TCP")
+                .withPort(8080)
+                .withTargetPort(new IntOrString("http"))
+                .build());
     }
 
     private ResourceRequirements getResources() {

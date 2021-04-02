@@ -40,9 +40,9 @@ public abstract class AbstractKafkaCluster implements Operand<ManagedKafka> {
     public boolean isInstalling(ManagedKafka managedKafka) {
         Kafka kafka = cachedKafka(managedKafka);
         boolean isInstalling = kafka == null || kafka.getStatus() == null ||
-                kafkaCondition(kafka, c->c.getType().equals("NotReady")
-                && c.getStatus().equals("True")
-                && c.getReason().equals("Creating"));
+                kafkaCondition(kafka, c -> c.getType().equals("NotReady")
+                        && c.getStatus().equals("True")
+                        && c.getReason().equals("Creating"));
         log.debugf("KafkaCluster isInstalling = %s", isInstalling);
         return isInstalling;
     }
@@ -51,7 +51,7 @@ public abstract class AbstractKafkaCluster implements Operand<ManagedKafka> {
     public boolean isReady(ManagedKafka managedKafka) {
         Kafka kafka = cachedKafka(managedKafka);
         boolean isReady = kafka != null && (kafka.getStatus() == null ||
-                kafkaCondition(kafka, c->c.getType().equals("Ready") && c.getStatus().equals("True")));
+                kafkaCondition(kafka, c -> c.getType().equals("Ready") && c.getStatus().equals("True")));
         log.debugf("KafkaCluster isReady = %s", isReady);
         return isReady;
     }
@@ -60,9 +60,9 @@ public abstract class AbstractKafkaCluster implements Operand<ManagedKafka> {
     public boolean isError(ManagedKafka managedKafka) {
         Kafka kafka = cachedKafka(managedKafka);
         boolean isError = kafka != null && kafka.getStatus() != null
-            && kafkaCondition(kafka, c->c.getType().equals("NotReady")
-            && c.getStatus().equals("True")
-            && !c.getReason().equals("Creating"));
+                && kafkaCondition(kafka, c -> c.getType().equals("NotReady")
+                        && c.getStatus().equals("True")
+                        && !c.getReason().equals("Creating"));
         log.debugf("KafkaCluster isError = %s", isError);
         return isError;
     }
@@ -99,9 +99,10 @@ public abstract class AbstractKafkaCluster implements Operand<ManagedKafka> {
     protected void createOrUpdate(Kafka kafka) {
         // Kafka resource doesn't exist, has to be created
         if (kafkaResourceClient.getByName(kafka.getMetadata().getNamespace(), kafka.getMetadata().getName()) == null) {
-            log.infof("Creating Kafka instance %s/%s", kafka.getMetadata().getNamespace(), kafka.getMetadata().getName());
+            log.infof("Creating Kafka instance %s/%s", kafka.getMetadata().getNamespace(),
+                    kafka.getMetadata().getName());
             kafkaResourceClient.create(kafka);
-        // Kafka resource already exists, has to be updated
+            // Kafka resource already exists, has to be updated
         } else {
             log.infof("Updating Kafka instance %s", kafka.getSpec().getKafka().getVersion());
             kafkaResourceClient.patch(kafka);
