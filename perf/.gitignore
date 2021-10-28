@@ -20,5 +20,6 @@ output_charts/
 .factorypath
 .project
 .settings/
-.log
+*.log
 /target/
+*.jks

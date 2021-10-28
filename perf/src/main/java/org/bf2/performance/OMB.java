@@ -45,6 +45,7 @@ import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -123,7 +124,7 @@ public class OMB {
             nsAnnotations.put(Constants.ORG_BF2_KAFKA_PERFORMANCE_COLLECTPODLOG, "true");
         }
         ombCluster.createNamespace(Constants.OMB_NAMESPACE, nsAnnotations, Map.of());
-        String keystore = tlsConfig.getTrustStoreBase64();
+        String keystore = tlsConfig != null ? tlsConfig.getTrustStoreBase64() : Base64.getEncoder().encodeToString(Files.readAllBytes(new File(Constants.SUITE_ROOT + "/truststore.jks").toPath()));;
         ombCluster.kubeClient().client().secrets().inNamespace(Constants.OMB_NAMESPACE).create(new SecretBuilder()
                 .editOrNewMetadata()
                 .withName("ext-listener-crt")

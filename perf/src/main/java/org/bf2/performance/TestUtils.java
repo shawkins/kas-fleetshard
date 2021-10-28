@@ -14,7 +14,10 @@ import org.bf2.performance.framework.KubeClusterResource;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 /**
@@ -28,6 +31,7 @@ public class TestUtils {
      */
     static final Quantity NODE_MEMORY_MARGIN = Quantity.parse("2.5Gi");
     static final Quantity NODE_CPU_MARGIN = Quantity.parse("500m");
+    private static final Random RANDOM = new Random();
 
     public static class AvailableResources {
         public long memoryBytes;
@@ -108,4 +112,13 @@ public class TestUtils {
         return resources;
     }
 
+    public static String payloadFileOfSize(Quantity size) throws IOException {
+        byte[] bytes = new byte[Quantity.getAmountInBytes(size).intValueExact()];
+        RANDOM.nextBytes(bytes);
+
+        Path file = Files.createTempFile(String.format("payload-%s-", size), ".data");
+        Files.write(file, bytes);
+        file.toFile().deleteOnExit();
+        return file.toAbsolutePath().toString();
+    }
 }
