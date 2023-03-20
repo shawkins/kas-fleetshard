@@ -1,10 +1,9 @@
 package org.bf2.operator.managers;
 
 import io.fabric8.kubernetes.client.KubernetesClient;
-import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.mockito.InjectMock;
-import io.quarkus.test.kubernetes.client.KubernetesServerTestResource;
+import io.quarkus.test.kubernetes.client.WithKubernetesTestServer;
 import io.strimzi.api.kafka.model.Kafka;
 import io.strimzi.api.kafka.model.KafkaBuilder;
 import org.bf2.common.ManagedKafkaResourceClient;
@@ -26,7 +25,7 @@ import java.util.function.Consumer;
 import static org.junit.Assert.assertNull;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-@QuarkusTestResource(KubernetesServerTestResource.class)
+@WithKubernetesTestServer
 @QuarkusTest
 class KafkaManagerTest {
 

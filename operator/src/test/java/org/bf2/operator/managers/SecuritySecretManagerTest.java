@@ -4,10 +4,9 @@ import io.fabric8.kubernetes.api.model.Secret;
 import io.fabric8.kubernetes.api.model.SecretBuilder;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.dsl.Resource;
-import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.TestProfile;
-import io.quarkus.test.kubernetes.client.KubernetesServerTestResource;
+import io.quarkus.test.kubernetes.client.WithKubernetesTestServer;
 import org.bf2.operator.MockProfile;
 import org.bf2.operator.resources.v1alpha1.ManagedKafka;
 import org.bf2.operator.resources.v1alpha1.ManagedKafkaAuthenticationOAuthBuilder;
@@ -35,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-@QuarkusTestResource(KubernetesServerTestResource.class)
+@WithKubernetesTestServer
 @TestProfile(MockProfile.class)
 @QuarkusTest
 class SecuritySecretManagerTest {

@@ -18,11 +18,10 @@ import io.fabric8.openshift.api.model.operator.v1.Config;
 import io.fabric8.openshift.api.model.operator.v1.IngressController;
 import io.fabric8.openshift.api.model.operator.v1.IngressControllerBuilder;
 import io.fabric8.openshift.client.OpenShiftClient;
-import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusMock;
 import io.quarkus.test.junit.QuarkusTest;
-import io.quarkus.test.kubernetes.client.KubernetesServerTestResource;
 import io.quarkus.test.kubernetes.client.KubernetesTestServer;
+import io.quarkus.test.kubernetes.client.WithKubernetesTestServer;
 import io.strimzi.api.kafka.model.Kafka;
 import org.bf2.common.ManagedKafkaAgentResourceClient;
 import org.bf2.common.OperandUtils;
@@ -61,7 +60,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@QuarkusTestResource(KubernetesServerTestResource.class)
+@WithKubernetesTestServer
 @QuarkusTest
 class IngressControllerManagerTest {
 

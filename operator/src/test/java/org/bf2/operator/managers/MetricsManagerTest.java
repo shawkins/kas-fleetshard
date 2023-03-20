@@ -5,9 +5,8 @@ import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
 import io.micrometer.core.instrument.Tags;
 import io.micrometer.core.instrument.search.Search;
-import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTest;
-import io.quarkus.test.kubernetes.client.KubernetesServerTestResource;
+import io.quarkus.test.kubernetes.client.WithKubernetesTestServer;
 import io.strimzi.api.kafka.model.Kafka;
 import io.strimzi.api.kafka.model.KafkaBuilder;
 import io.strimzi.api.kafka.model.listener.arraylistener.GenericKafkaListenerBuilder;
@@ -39,7 +38,7 @@ import static org.bf2.operator.operands.AbstractKafkaCluster.EXTERNAL_LISTENER_N
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-@QuarkusTestResource(KubernetesServerTestResource.class)
+@WithKubernetesTestServer
 @QuarkusTest
 public class MetricsManagerTest {
     private static final String NAMESPACE = "namespace";

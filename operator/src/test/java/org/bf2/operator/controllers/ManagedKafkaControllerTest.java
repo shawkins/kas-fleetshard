@@ -3,10 +3,9 @@ package org.bf2.operator.controllers;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.javaoperatorsdk.operator.api.reconciler.Context;
 import io.javaoperatorsdk.operator.api.reconciler.UpdateControl;
-import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.mockito.InjectMock;
-import io.quarkus.test.kubernetes.client.KubernetesServerTestResource;
+import io.quarkus.test.kubernetes.client.WithKubernetesTestServer;
 import io.strimzi.api.kafka.model.Kafka;
 import org.bf2.common.ManagedKafkaAgentResourceClient;
 import org.bf2.operator.ManagedKafkaKeys;
@@ -34,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@QuarkusTestResource(KubernetesServerTestResource.class)
+@WithKubernetesTestServer
 @QuarkusTest
 class ManagedKafkaControllerTest {
 

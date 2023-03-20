@@ -11,10 +11,9 @@ import io.fabric8.kubernetes.client.dsl.Resource;
 import io.fabric8.kubernetes.client.informers.ResourceEventHandler;
 import io.fabric8.kubernetes.client.server.mock.KubernetesServer;
 import io.fabric8.kubernetes.client.utils.Serialization;
-import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTest;
-import io.quarkus.test.kubernetes.client.KubernetesServerTestResource;
 import io.quarkus.test.kubernetes.client.KubernetesTestServer;
+import io.quarkus.test.kubernetes.client.WithKubernetesTestServer;
 import io.strimzi.api.kafka.model.Kafka;
 import io.strimzi.api.kafka.model.status.ConditionBuilder;
 import io.strimzi.api.kafka.model.status.KafkaStatusBuilder;
@@ -47,7 +46,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@QuarkusTestResource(KubernetesServerTestResource.class)
+@WithKubernetesTestServer
 @QuarkusTest
 public class StrimziManagerTest {
 

@@ -4,11 +4,10 @@ import io.fabric8.kubernetes.client.server.mock.KubernetesServer;
 import io.fabric8.kubernetes.client.utils.Serialization;
 import io.fabric8.openshift.api.model.operator.v1.IngressController;
 import io.fabric8.openshift.client.OpenShiftClient;
-import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.mockito.InjectMock;
-import io.quarkus.test.kubernetes.client.KubernetesServerTestResource;
 import io.quarkus.test.kubernetes.client.KubernetesTestServer;
+import io.quarkus.test.kubernetes.client.WithKubernetesTestServer;
 import org.bf2.common.ManagedKafkaAgentResourceClient;
 import org.bf2.operator.resources.v1alpha1.ManagedKafkaAgentBuilder;
 import org.bf2.operator.resources.v1alpha1.ProfileBuilder;
@@ -22,7 +21,7 @@ import java.util.LongSummaryStatistics;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@QuarkusTestResource(KubernetesServerTestResource.class)
+@WithKubernetesTestServer
 @QuarkusTest
 public class IngressControllerManagerWithProfilesTest {
 

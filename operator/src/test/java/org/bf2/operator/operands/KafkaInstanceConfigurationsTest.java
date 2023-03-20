@@ -6,10 +6,9 @@ import io.fabric8.openshift.api.model.Infrastructure;
 import io.fabric8.openshift.api.model.InfrastructureBuilder;
 import io.fabric8.openshift.client.OpenShiftClient;
 import io.fabric8.openshift.client.dsl.OpenShiftConfigAPIGroupDSL;
-import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusMock;
 import io.quarkus.test.junit.QuarkusTest;
-import io.quarkus.test.kubernetes.client.KubernetesServerTestResource;
+import io.quarkus.test.kubernetes.client.WithKubernetesTestServer;
 import org.bf2.operator.managers.MockOpenShiftSupport;
 import org.bf2.operator.managers.OperandOverrideManager;
 import org.bf2.operator.operands.KafkaInstanceConfigurations.InstanceType;
@@ -33,7 +32,7 @@ import java.util.function.Predicate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@QuarkusTestResource(KubernetesServerTestResource.class)
+@WithKubernetesTestServer
 @QuarkusTest
 class KafkaInstanceConfigurationsTest {
 
